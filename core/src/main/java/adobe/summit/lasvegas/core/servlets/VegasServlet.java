@@ -8,10 +8,7 @@ import java.util.Set;
 import javax.jcr.Node;
 import javax.servlet.ServletException;
 
-import org.apache.felix.scr.annotations.Activate;
-import org.apache.felix.scr.annotations.Component;
-import org.apache.felix.scr.annotations.Property;
-import org.apache.felix.scr.annotations.Reference;
+import org.apache.felix.scr.annotations.*;
 import org.apache.felix.scr.annotations.sling.SlingServlet;
 import org.apache.sling.api.SlingHttpServletRequest;
 import org.apache.sling.api.SlingHttpServletResponse;
@@ -31,7 +28,7 @@ import com.day.cq.wcm.api.PageManager;
 // http://localhost:4510/bin/vegas?path=/content/aemcodingerrors/en
 //
 
-@Component(metatype=true)
+@Component(metatype=true, policy = ConfigurationPolicy.REQUIRE)
 @SlingServlet(paths="/bin/vegas", methods="GET", name="Las Vegas servlet", metatype=true, generateComponent=false)
 public class VegasServlet extends SlingAllMethodsServlet {
 	
@@ -50,7 +47,7 @@ public class VegasServlet extends SlingAllMethodsServlet {
 		configuredProps = (String[])  context.getProperties().get("propertyNames");
 
 		if (configuredProps != null)
-		LOGGER.info("props" + configuredProps.length);
+		LOGGER.info("props {}", configuredProps.length);
 	}
 	
 	
@@ -62,7 +59,7 @@ public class VegasServlet extends SlingAllMethodsServlet {
 		PageManager pm = request.getResourceResolver().adaptTo(PageManager.class);
 		Page page = pm.getPage(path);
 		
-		if ( page != null && isEnabled()) {
+		if ( page != null) {
 			JSONObject json = new JSONObject();
 			PrintWriter pw = response.getWriter();
 			Node pageNode = page.getContentResource().adaptTo(Node.class);
@@ -86,23 +83,5 @@ public class VegasServlet extends SlingAllMethodsServlet {
 			return "";
 		}
 	}
-
-	/**
-	 * This servlet is enabled for author instances
-	 * @return
-	 */
-	private boolean isEnabled() {
-		Set<String> runModes = slingSettingsService.getRunModes();
-		Iterator<String> runmodesIt = runModes.iterator();
-		
-		while (runmodesIt.hasNext()) {
-			String runMode = runmodesIt.next();
-			if ( runMode.equals("author")) {
-				return true;
-			}
-		}
-		return false;
-	}
-	
 	
 }
