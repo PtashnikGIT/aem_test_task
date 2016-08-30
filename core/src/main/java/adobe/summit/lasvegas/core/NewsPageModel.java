@@ -9,16 +9,7 @@ public class NewsPageModel {
 	private String imagePath;
 	private String introText;
 	private String title;
-	private boolean first;
-	
-	public boolean isFirst() {
-		return first;
-	}
 
-
-	public void setFirst(boolean first) {
-		this.first = first;
-	}
 	private XSSAPI xssapi;
 	
 	public NewsPageModel(XSSAPI xssapi) {

@@ -5,7 +5,8 @@
         jcr:primaryType="nt:unstructured"
         jcr:title="Page 3"
         pageTitle="Page 3"
-        sling:resourceType="aemcodingerrors/components/structure/page">
+        sling:resourceType="aemcodingerrors/components/structure/page"
+        hideInNav="true">
         <logo
             jcr:primaryType="nt:unstructured"
             sling:resourceType="aemcodingerrors/components/structure/logo"/>

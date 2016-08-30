@@ -6,6 +6,7 @@
     allowedPaths="[/content/aemcodingerrors/.+]"
     ranking="{Long}100">
     <jcr:content
+        hideInNav="{Boolean}false"
         jcr:primaryType="cq:PageContent"
         sling:resourceType="aemcodingerrors/components/structure/page">
         <logo

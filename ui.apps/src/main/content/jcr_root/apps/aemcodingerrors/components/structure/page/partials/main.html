@@ -26,7 +26,7 @@
     
 	<div data-sly-use.newspages="adobe.summit.lasvegas.core.NewsPages" data-sly-unwrap></div>
 	<div class="pages2" data-sly-list="${newspages.newsPages}">
-	<div class="newstitle" data-sly-test="${item.first}">News</div>
+    <div class="newstitle" data-sly-test="${pages2}">News</div>
 
 		<article class="newspage">
 			<a href="${item.path}.html" class="title">${item.title}</a>
