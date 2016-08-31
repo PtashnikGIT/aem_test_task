@@ -1,94 +1,63 @@
 package adobe.summit.lasvegas.core;
 
+import com.adobe.cq.sightly.WCMUse;
+import com.day.cq.wcm.api.Page;
+import org.apache.sling.api.resource.Resource;
+import org.apache.sling.api.resource.ValueMap;
+
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import javax.jcr.Node;
-import javax.jcr.NodeIterator;
-import javax.jcr.Session;
-
-import org.apache.felix.scr.annotations.Reference;
-import org.apache.sling.jcr.api.SlingRepository;
-
-import com.adobe.cq.sightly.WCMUse;
-import com.adobe.granite.xss.XSSAPI;
-import com.day.cq.wcm.api.Page;
-
 public class NewsPages extends WCMUse {
 
-
-    @Reference
-    private SlingRepository repo;
-
-    @Reference
-    private XSSAPI xssAPI;
-
-
-    private Session session;
-
-    @Override
-    public void activate() throws Exception {
-        if (repo == null) {
-            repo = getSlingScriptHelper().getService(SlingRepository.class);
-        }
-        if (repo != null) {
-            session = repo.loginAdministrative(null);
-        }
-        xssAPI = getSlingScriptHelper().getService(XSSAPI.class);
-    }
+    private final List<NewsPageModel> newsPages = new ArrayList<>();
 
     /**
-     * Method to build and return a list of NewsPageModel, this will be iterated to list
+     * Method to build a list of NewsPageModel, this will be iterated to list
      * the subpages with the right properties
      *
-     * @return
-     * @throws Exception
      */
-    public List<NewsPageModel> getNewsPages() throws Exception {
-        List<NewsPageModel> returnvalue = new ArrayList<NewsPageModel>();
+    @Override
+    public void activate() {
         Iterator<Page> pageIterator = getCurrentPage().listChildren();
 
         // Looking through the subpages
         while (pageIterator.hasNext()) {
             Page page = pageIterator.next();
-            Node pageNode = session.getNode(page.getPath());
-            if (pageNode != null && pageNode.hasNode("jcr:content")) {
-                Node contentNode = pageNode.getNode("jcr:content");
-                if (contentNode != null) {
+            Resource contentResource = page.getContentResource();
+            if (contentResource != null) {
+                NewsPageModel model = new NewsPageModel();
+                model.setPath(page.getPath());
+                model.setTitle(page.getTitle());
 
+                if (!page.isHideInNav()) {
 
-                    NewsPageModel model = new NewsPageModel(xssAPI);
-                    model.setPath(pageNode.getPath());
-                    model.setTitle(contentNode.getProperty("jcr:title").getString());
-
-                        if (!contentNode.hasProperty("hideInNav") || !contentNode.getProperty("hideInNav").getBoolean()) {
-                            if (contentNode.hasNode("par")) {
-                                NodeIterator parNodes = contentNode.getNode("par").getNodes();
-                                while (parNodes.hasNext()) {
-
-                                    Node parNode = parNodes.nextNode();
-
-                                    if (parNode.getProperty("sling:resourceType").getString().endsWith("/text")) {
-                                        if (model.getIntroText() == null) {
-                                            model.setIntroText(parNode.getProperty("text").getString());
-                                        }
-                                    } else if (parNode.getProperty("sling:resourceType").getString().endsWith("/image")) {
-                                        if (model.getImagePath() == null) {
-                                            model.setImagePath(parNode.getProperty("fileReference").getString());
-                                        }
-                                    }
-
+                    final Resource par = contentResource.getChild("par");
+                    if (par != null) {
+                        for (Resource child : par.getChildren()) {
+                            if (child.isResourceType("aemcodingerrors/components/content/text")) {
+                                if (model.getIntroText() == null) {
+                                    model.setIntroText(child.adaptTo(ValueMap.class).get("text", String.class));
+                                }
+                            } else
+                            if (child.isResourceType("aemcodingerrors/components/content/image")) {
+                                if (model.getImagePath() == null) {
+                                    model.setImagePath(child.adaptTo(ValueMap.class).get("fileReference", String.class));
                                 }
                             }
                         }
-
-                    returnvalue.add(model);
+                    }
                 }
+
+                newsPages.add(model);
             }
         }
 
-        return returnvalue;
+    }
+
+    public List<NewsPageModel> getNewsPages() {
+        return newsPages;
     }
 
 }

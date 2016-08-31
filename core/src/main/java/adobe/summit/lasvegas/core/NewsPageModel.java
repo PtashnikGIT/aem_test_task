@@ -1,7 +1,5 @@
 package adobe.summit.lasvegas.core;
 
-import com.adobe.granite.xss.XSSAPI;
-
 public class NewsPageModel {
 	
 	private String name;
@@ -10,12 +8,6 @@ public class NewsPageModel {
 	private String introText;
 	private String title;
 
-	private XSSAPI xssapi;
-	
-	public NewsPageModel(XSSAPI xssapi) {
-		this.xssapi = xssapi;
-	}
-	
 	
 	public String getName() {
 		return name;
@@ -36,9 +28,6 @@ public class NewsPageModel {
 		this.imagePath = imagePath;
 	}
 	public String getIntroText() {
-		if ( introText != null) {
-			return xssapi.filterHTML(introText);
-		}
 		return introText;
 	}
 	public void setIntroText(String introText) {
