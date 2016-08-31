@@ -67,8 +67,9 @@ public class VegasServlet extends SlingAllMethodsServlet {
 			} catch (JSONException e) {
 				LOGGER.error(e.getMessage(), e);
 				throw new ServletException(e);
-			}
-			pw.close();
+			} finally {
+                pw.close();
+            }
 
 		}
 	}
